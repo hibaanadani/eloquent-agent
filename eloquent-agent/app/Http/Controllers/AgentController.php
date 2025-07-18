@@ -11,8 +11,23 @@ class AgentController extends Controller
     function getAllAgents(){
         foreach (Agent::all() as $agent) {
         echo $agent->name;
+}}
+
+    function findAgent($id){
+        return Agent::findOrFail($id);
 }
-    }
+
+function createAgent(Request $request){
+    return Agent::create([
+        'name'=>$request->name
+    ]);
+}
+function firstOrCreateAgent(Request $request){
+    return Agent::firstOrCreate([
+       ['name'=>$request->name]
+    ]);
+}
+
     function getAgentByID($id){
         $agents=Agent::where('id',$id)
         ->orderBy('name')
@@ -58,7 +73,7 @@ class AgentController extends Controller
     function getAgentsByChunk(){
         Agent::chunk(20, function (Collection $agents) {
             foreach ($agents as $agent) 
-                return $agent;
+               echo $agent->name;
     
     });
  }
@@ -77,5 +92,12 @@ class AgentController extends Controller
     function destroyAgent($ids){
         $id=explode(',',$ids);
         Agent::destroy($ids);
+    }
+    function copyAgent(Request $request){
+        $agent=Agent::find($request["id"]);
+        $newAgent=$agent->replicate()->fill([
+            'name'=>$request['name']
+        ]);
+        $newAgent->save();
     }
 }
